@@ -9,7 +9,6 @@ public class DecisionTreeDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // Set your database connection string
         optionsBuilder.UseSqlServer("data source=.;initial catalog=decision-db;User Id=sa;Password=2H13okXCMssql;TrustServerCertificate=True;");
     }
 

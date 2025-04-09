@@ -11,6 +11,6 @@ public class DecisionNode
     public int? FalseBranchId { get; set; } // False branch node ID
 
     // Navigation properties for EF
-    public DecisionNode TrueBranch { get; set; }
-    public DecisionNode FalseBranch { get; set; }
+    public DecisionNode? TrueBranch { get; set; }
+    public DecisionNode? FalseBranch { get; set; }
 }

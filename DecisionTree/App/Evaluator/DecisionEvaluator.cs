@@ -1,4 +1,5 @@
 ﻿using App.Repository;
+using Flee.PublicTypes;
 using System.Data;
 
 namespace App.Evaluator;
@@ -12,7 +13,7 @@ public class DecisionTreeEvaluator
         _repository = repository;
     }
 
-    public int EvaluateTree(int treeId, Dictionary<string, int> customerData)
+    public double EvaluateTree(int treeId, Dictionary<string, double> customerData)
     {
         var root = _repository.GetRootNode(treeId);
         if (root == null)
@@ -20,7 +21,8 @@ public class DecisionTreeEvaluator
 
         var currentNode = root;
 
-        while (!currentNode.Score.HasValue)
+        // Traverse the tree
+        while (!currentNode.IsLeaf)
         {
             var condition = ReplaceVariablesWithValues(currentNode.Condition, customerData);
             bool result = EvaluateCondition(condition);
@@ -30,20 +32,33 @@ public class DecisionTreeEvaluator
                 : _repository.GetNode(currentNode.FalseBranchId.Value);
         }
 
-        return currentNode.Score.Value;
+        // Evaluate formula at the leaf node
+        return EvaluateFormula(currentNode.Formula, customerData);
     }
 
-    private string ReplaceVariablesWithValues(string condition, Dictionary<string, int> variables)
+    private string ReplaceVariablesWithValues(string input, Dictionary<string, double> variables)
     {
         foreach (var variable in variables)
         {
-            condition = condition.Replace(variable.Key, variable.Value.ToString());
+            input = input.Replace(variable.Key, variable.Value.ToString());
         }
-        return condition;
+        return input;
     }
 
     private bool EvaluateCondition(string condition)
     {
         return (bool)new DataTable().Compute(condition, null);
+    }
+
+    private double EvaluateFormula(string formula, Dictionary<string, double> variables)
+    {
+        var context = new ExpressionContext();
+        foreach (var variable in variables)
+        {
+            context.Variables[variable.Key] = variable.Value;
+        }
+
+        var compiledFormula = context.CompileDynamic(formula);
+        return Convert.ToDouble(compiledFormula.Evaluate());
     }
 }

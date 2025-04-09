@@ -2,15 +2,17 @@
 
 public class DecisionNode
 {
-    public int Id { get; set; } // Primary Key
-    public int TreeId { get; set; } // Foreign Key for tree identification
-
-    public string? Condition { get; set; } // Logical condition (e.g., "score > 50")
-    public int? Score { get; set; } // Score for leaf nodes
-    public int? TrueBranchId { get; set; } // True branch node ID
-    public int? FalseBranchId { get; set; } // False branch node ID
+    public int Id { get; set; }
+    public int TreeId { get; set; }
+    public string? Condition { get; set; } // Condition for branching
+    public string? Formula { get; set; }  // Math formula for scoring (optional)
+    public int? TrueBranchId { get; set; }
+    public int? FalseBranchId { get; set; }
 
     // Navigation properties for EF
     public DecisionNode? TrueBranch { get; set; }
     public DecisionNode? FalseBranch { get; set; }
+
+    // Check if the node is a leaf node
+    public bool IsLeaf => TrueBranchId == null && FalseBranchId == null && Formula != null;
 }

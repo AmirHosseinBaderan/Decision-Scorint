@@ -1,11 +1,12 @@
-﻿using App.Context;
-using App.Domain;
+﻿using App.Builder;
+using App.Context;
 using App.Evaluator;
 using App.Repository;
 
 using var context = new DecisionTreeDbContext();
 var repository = new DecisionTreeRepository(context);
 var evaluator = new DecisionTreeEvaluator(repository);
+var builder = new DecisionTreeBuilder(repository);
 
 while (true)
 {
@@ -26,26 +27,8 @@ while (true)
     switch (choice)
     {
         case 1:
-            // Add a new decision tree
-            var root = new DecisionNode
-            {
-                Condition = "score > 50",
-                TrueBranch = new DecisionNode
-                {
-                    Condition = "score > 80",
-                    TrueBranch = new DecisionNode { Score = 100 },
-                    FalseBranch = new DecisionNode { Score = 70 }
-                },
-                FalseBranch = new DecisionNode
-                {
-                    Condition = "score > 30",
-                    TrueBranch = new DecisionNode { Score = 50 },
-                    FalseBranch = new DecisionNode { Score = 20 }
-                }
-            };
-
-            repository.AddTree(root);
-            Console.WriteLine("A new decision tree has been added.");
+            // Add a new decision tree dynamically
+            builder.AddNewTree();
             break;
 
         case 2:

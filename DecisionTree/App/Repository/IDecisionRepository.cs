@@ -6,7 +6,8 @@ public interface IDecisionTreeRepository
 {
     void AddTree(DecisionNode root);
     DecisionNode GetNode(int nodeId);
-    List<DecisionNode> GetAllNodes(int treeId);
-    void UpdateNodeCondition(int nodeId, string newCondition);
     DecisionNode GetRootNode(int treeId);
+    List<DecisionNode> GetAllNodes(int treeId);
+    void UpdateNodeCondition(int nodeId, string condition);
+    void UpdateNodeFormula(int nodeId, string formula);
 }

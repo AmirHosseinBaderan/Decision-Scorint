@@ -23,23 +23,33 @@ public class DecisionTreeRepository : IDecisionTreeRepository
         return _context.DecisionNodes.Find(nodeId);
     }
 
+    public DecisionNode GetRootNode(int treeId)
+    {
+        return _context.DecisionNodes.FirstOrDefault(n => n.TreeId == treeId && n.TrueBranchId == null && n.FalseBranchId == null);
+    }
+
     public List<DecisionNode> GetAllNodes(int treeId)
     {
         return _context.DecisionNodes.Where(n => n.TreeId == treeId).ToList();
     }
 
-    public void UpdateNodeCondition(int nodeId, string newCondition)
+    public void UpdateNodeCondition(int nodeId, string condition)
     {
         var node = _context.DecisionNodes.Find(nodeId);
         if (node != null)
         {
-            node.Condition = newCondition;
+            node.Condition = condition;
             _context.SaveChanges();
         }
     }
 
-    public DecisionNode GetRootNode(int treeId)
+    public void UpdateNodeFormula(int nodeId, string formula)
     {
-        return _context.DecisionNodes.FirstOrDefault(n => n.TreeId == treeId && n.TrueBranchId != null && n.FalseBranchId != null);
+        var node = _context.DecisionNodes.Find(nodeId);
+        if (node != null)
+        {
+            node.Formula = formula;
+            _context.SaveChanges();
+        }
     }
 }

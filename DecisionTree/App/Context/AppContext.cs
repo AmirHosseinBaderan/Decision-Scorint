@@ -10,7 +10,7 @@ public class DecisionTreeDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Set your database connection string
-        optionsBuilder.UseSqlServer("server=.;Initital Catalog=DecisionDb;User Id=sa;Password=2H13okXcMssql;TrustServerCertificate=True");
+        optionsBuilder.UseSqlServer("server=.;Initial Catalog=DecisionDb;User Id=sa;Password=2H13okXcMssql;TrustServerCertificate=True");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

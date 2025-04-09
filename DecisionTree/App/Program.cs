@@ -1,39 +1,50 @@
-﻿using App.Builder;
-using App.Context;
+﻿using App.Context;
+using App.Domain;
 using App.Evaluator;
 using App.Repository;
 
 using var context = new DecisionTreeDbContext();
 var repository = new DecisionTreeRepository(context);
 var evaluator = new DecisionTreeEvaluator(repository);
-var builder = new DecisionTreeBuilder(repository);
 
 while (true)
 {
     Console.WriteLine("\nChoose an action:");
     Console.WriteLine("1. Add a new decision tree");
-    Console.WriteLine("2. Update an existing decision node condition");
-    Console.WriteLine("3. Show all decision nodes for a tree");
-    Console.WriteLine("4. Run and test a decision tree");
+    Console.WriteLine("2. Update a node condition");
+    Console.WriteLine("3. Show all nodes in a tree");
+    Console.WriteLine("4. Evaluate a tree with sample data");
     Console.WriteLine("5. Exit");
 
     Console.Write("Enter your choice: ");
-    if (!int.TryParse(Console.ReadLine(), out int choice))
-    {
-        Console.WriteLine("Invalid input.");
-        continue;
-    }
+    int choice = int.Parse(Console.ReadLine());
 
     switch (choice)
     {
         case 1:
-            // Add a new decision tree dynamically
-            builder.AddNewTree();
+            Console.WriteLine("Creating a new tree...");
+            var root = new DecisionNode
+            {
+                Score = null,
+                TreeId = 1,
+                Condition = "purchases > 5",
+                TrueBranch = new DecisionNode
+                {
+                    Condition = "spending > 100",
+                    TrueBranch = new DecisionNode { Score = 50 },
+                    FalseBranch = new DecisionNode { Score = 30 }
+                },
+                FalseBranch = new DecisionNode
+                {
+                    Score = 10
+                }
+            };
+            repository.AddTree(root);
+            Console.WriteLine("Tree created successfully!");
             break;
 
         case 2:
-            // Update an existing node condition
-            Console.Write("Enter the Node ID to update: ");
+            Console.Write("Enter the node ID to update: ");
             int nodeId = int.Parse(Console.ReadLine());
             Console.Write("Enter the new condition: ");
             string newCondition = Console.ReadLine();
@@ -42,26 +53,23 @@ while (true)
             break;
 
         case 3:
-            // Show all decision nodes
-            Console.Write("Enter the Tree ID: ");
-            int treeIdToShow = int.Parse(Console.ReadLine());
-            var nodes = repository.GetAllNodes(treeIdToShow);
-
-            Console.WriteLine($"Decision Nodes for Tree ID {treeIdToShow}:");
+            Console.Write("Enter the Tree ID to display: ");
+            int treeId = int.Parse(Console.ReadLine());
+            var nodes = repository.GetAllNodes(treeId);
             foreach (var node in nodes)
             {
-                Console.WriteLine($"Node ID: {node.Id}, Condition: {node.Condition}, Score: {node.Score}, TrueBranchId: {node.TrueBranchId}, FalseBranchId: {node.FalseBranchId}");
+                Console.WriteLine($"ID: {node.Id}, Condition: {node.Condition}, Score: {node.Score}");
             }
             break;
 
         case 4:
-            // Evaluate a decision tree
-            Console.Write("Enter the Tree ID: ");
-            int treeId = int.Parse(Console.ReadLine());
-            Console.Write("Enter the score to evaluate: ");
-            int inputScore = int.Parse(Console.ReadLine());
-            int result = evaluator.EvaluateTree(treeId, inputScore);
-            Console.WriteLine($"The evaluated score is: {result}");
+            Console.Write("Enter the Tree ID to evaluate: ");
+            int evalTreeId = int.Parse(Console.ReadLine());
+            Console.WriteLine("Enter customer data (e.g., purchases:5,spending:50):");
+            string[] data = Console.ReadLine().Split(',');
+            Dictionary<string, int> customerData = data.Select(d => d.Split(':')).ToDictionary(k => k[0], v => int.Parse(v[1]));
+            int result = evaluator.EvaluateTree(evalTreeId, customerData);
+            Console.WriteLine($"Evaluated score: {result}");
             break;
 
         case 5:
@@ -69,7 +77,7 @@ while (true)
             return;
 
         default:
-            Console.WriteLine("Invalid choice.");
+            Console.WriteLine("Invalid choice!");
             break;
     }
 }

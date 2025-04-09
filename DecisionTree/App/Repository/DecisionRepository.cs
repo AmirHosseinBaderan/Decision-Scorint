@@ -40,6 +40,6 @@ public class DecisionTreeRepository : IDecisionTreeRepository
 
     public DecisionNode GetRootNode(int treeId)
     {
-        return _context.DecisionNodes.FirstOrDefault(n => n.TreeId == treeId && n.TrueBranchId == null && n.FalseBranchId == null);
+        return _context.DecisionNodes.FirstOrDefault(n => n.TreeId == treeId && n.TrueBranchId != null && n.FalseBranchId != null);
     }
 }

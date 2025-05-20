@@ -1,4 +1,5 @@
-﻿using App.Repository;
+﻿using App.Domain;
+using App.Repository;
 using Flee.PublicTypes;
 using System.Data;
 
@@ -30,6 +31,30 @@ public class DecisionTreeEvaluator
             currentNode = result
                 ? _repository.GetNode(currentNode.TrueBranchId.Value)
                 : _repository.GetNode(currentNode.FalseBranchId.Value);
+        }
+
+        // Evaluate formula at the leaf node
+        return EvaluateFormula(currentNode.Formula, customerData);
+    }
+
+    public double EvaluateTree(List<DecisionNode> treeNodes, int treeId, Dictionary<string, double> customerData)
+    {
+        // Find the root node (assuming the first node is the root)
+        var root = treeNodes.Find(n => n.TreeId == treeId && n.Id == 1);
+        if (root == null)
+            throw new Exception("Tree not found!");
+
+        var currentNode = root;
+
+        // Traverse the tree
+        while (!currentNode.IsLeaf)
+        {
+            var condition = ReplaceVariablesWithValues(currentNode.Condition, customerData);
+            bool result = EvaluateCondition(condition);
+
+            currentNode = result
+                ? treeNodes.Find(n => n.Id == currentNode.TrueBranchId)
+                : treeNodes.Find(n => n.Id == currentNode.FalseBranchId);
         }
 
         // Evaluate formula at the leaf node

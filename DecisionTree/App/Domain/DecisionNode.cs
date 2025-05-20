@@ -15,4 +15,7 @@ public class DecisionNode
 
     // Check if the node is a leaf node
     public bool IsLeaf => TrueBranchId == null && FalseBranchId == null && Formula != null;
+
+    public override string ToString() =>
+       $"{Condition ?? "NULL"} ? {(TrueBranchId.HasValue ? "C" + TrueBranchId : "NULL")} : {(FalseBranchId.HasValue ? "C" + FalseBranchId : "NULL")} | {Formula ?? "NULL"}";
 }
